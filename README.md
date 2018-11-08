@@ -13,7 +13,11 @@ The code to create and populate the necessary tables is included in the 'secure_
 
 Username	: test_user 
 Email		: test@example.com 
-Password	: 6ZaxN2Vzm9NUJT2y
+Password	: 6ZaxN2Vzm9NUJRE
 
-The registration page is now implemented, so you can register as many users as you like.  However you may still need the test_user for testing purposes in the future when we come to adding roles to users.
+
+CREATE database secure_login;
+USE secure_login;
+source address_of_sql_file;
+
 
