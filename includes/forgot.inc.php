@@ -24,11 +24,13 @@ $error_msg = "";
 
 if (isset($_POST['username'], $_POST['email'], $_POST['p'],$_POST['question'],$_POST['ans'])) {
     // Sanitize and validate the data passed in
+    
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $email = filter_var($email, FILTER_VALIDATE_EMAIL);
     $ques = filter_input(INPUT_POST,'question');
     $ans = filter_input(INPUT_POST, 'ans');
+
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         // Not a valid email
         $error_msg .= '<p class="error">The email address you entered is not valid</p>';
@@ -47,7 +49,7 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'],$_POST['question'],$_
     // breaking these rules.
     //
 
-    $prep_stmt = "SELECT id FROM members WHERE email = ? LIMIT 1";
+    $prep_stmt = "SELECT id,ques,ans FROM members WHERE email = ? LIMIT 1";
     $stmt = $mysqli->prepare($prep_stmt);
 
     if ($stmt) {
@@ -55,44 +57,41 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'],$_POST['question'],$_
         $stmt->execute();
         $stmt->store_result();
 
-        if ($stmt->num_rows == 1) {
+        if ($stmt->num_rows == 0) {
             // A user with this email address already exists
-            $error_msg .= '<p class="error">A user with this email address already exists.</p>';
+            $error_msg .= '<p class="error">No user with this email address</p>';
         }
     } else {
         $error_msg .= '<p class="error">Database error</p>';
     }
 
-		$prep_stmt1 = "SELECT id FROM members WHERE username = ? LIMIT 1";
+		$prep_stmt1 = "SELECT id,ques,ans FROM members WHERE username = ? LIMIT 1";
     $stmt1 = $mysqli->prepare($prep_stmt1);
 
     if ($stmt1) {
         $stmt1->bind_param('s', $username);
         $stmt1->execute();
-        $stmt1->store_result();
+        $res = $stmt1->get_result();
+        //$stmt1->store_result();
 
-        if ($stmt1->num_rows == 1) {
+        if ($res->num_rows == 0) {
             // A user with this email address already exists
-            $error_msg .= '<p class="error">A user with this username already exists.</p>';
-						$l=0;
-						for($i = 0 ; $i < 100 ; $i++)
-						{
-							if($i==99){
-								$i=0;
-								$l=$l+10000;
-								continue;
-							}
-							$rnum=rand($l,$l+10000);
-							$usercheck = $username.$rnum;
-							$stmt1->bind_param('s', $usercheck);
-			        $stmt1->execute();
-			        $stmt1->store_result();
-							if ($stmt1->num_rows == 0)
-							{
-									$error_msg .= '<p class="error">Try '.$usercheck.'</p>';
-									break;
-							}
-						}
+            $error_msg .= '<p class="error">No user with this username</p>';
+						
+        }
+        else if($res->num_rows==1){
+            //$stmt1->bind_result($id, $ques1, $ans1);
+            $row = $res->fetch_assoc();
+            
+            //$error_msg .= '<p class="error">TTTTTTTTTTTTTT</p>';
+            if($ques == $row["ques"] && $ans == $row["ans"])
+            {
+                echo "Success!";
+            }
+            else
+            {
+                $error_msg .= '<p class="error">Wrong security question or answer</p>';
+            }
         }
     } else {
         $error_msg .= '<p class="error">Database error</p>';
@@ -105,21 +104,22 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'],$_POST['question'],$_
 
     if (empty($error_msg)) {
         // Create a random salt
+        $error_msg .= '<p class="error">It was</p>';
         $random_salt = hash('sha512', uniqid(openssl_random_pseudo_bytes(16), TRUE));
 
         // Create salted password
         $password = hash('sha512', $password . $random_salt);
 
         // Insert the new user into the database
-        if ($insert_stmt = $mysqli->prepare("INSERT INTO members (username, email, password, salt, ques, ans) VALUES (?, ?, ?, ?, ?, ?)")) {
-            $insert_stmt->bind_param('ssssss', $username, $email, $password, $random_salt, $ques, $ans);
+        if ($insert_stmt = $mysqli->prepare("UPDATE members SET password = ?, salt = ? WHERE email = ?")) {
+            $insert_stmt->bind_param('sss', $password, $random_salt, $email);
             // Execute the prepared query.
             if (! $insert_stmt->execute()) {
                 header('Location: ../error.php?err=Registration failure: INSERT');
                 exit();
             }
         }
-        header('Location: ./register_success.php');
+        header('Location: ./forgot_success.php');
         exit();
     }
 }

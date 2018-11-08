@@ -59,7 +59,7 @@ function regformhash(form, uid, email, password, conf) {
     // At least one number, one lowercase and one uppercase letter
     // At least six characters
     // var re = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
-		// //var re = /.*/;
+   
     // if (!re.test(password.value)) {
     //     alert('Passwords must contain at least one number, one lowercase and one uppercase letter.  Please try again');
     //     return false;
@@ -72,19 +72,110 @@ function regformhash(form, uid, email, password, conf) {
         return false;
     }
 
-		var common_passwords = ["123456","password","12345678","qwerty","12345","123456789","letmein","1234567","football","iloveyou"];
+		// var common_passwords = ["123456","password","12345678","qwerty","12345","123456789","letmein","1234567","football","iloveyou"];
 
-		var i;
+		// var i;
 
-		for(i = 0 ; i < common_passwords.length; i++)
-		{
-			if(password.value == common_passwords[i])
-			{
-				alert("Weak Password!");
-				form.password.focus();
-				return false;
-			}
-		}
+		// for(i = 0 ; i < common_passwords.length; i++)
+		// {
+		// 	if(password.value == common_passwords[i])
+		// 	{
+		// 		alert("Weak Password!");
+		// 		form.password.focus();
+		// 		return false;
+		// 	}
+        // }
+        
+        var result = zxcvbn(password.value);
+        if(result.score == 0)
+        {
+            alert("Very Weak Password! Try Something else.");
+            form.password.focus;
+            return false;
+        }
+        else if(result.score == 1)
+        {
+            alert("Weak Password! Try something else.");
+            form.password.focus;
+            return false;
+        }
+        
+		// Create a new element input, this will be our hashed password field.
+    var p = document.createElement("input");
+
+    // Add the new element to our form.
+    form.appendChild(p);
+    p.name = "p";
+    p.type = "hidden";
+    p.value = hex_sha512(password.value);
+
+    // Make sure the plaintext password doesn't get sent.
+    password.value = "";
+    conf.value = "";
+
+    // Finally submit the form.
+    form.submit();
+    return true;
+}
+
+function forformhash(form, uid, email, password, conf) {
+    // Check each field has a value
+    if (uid.value == '' || email.value == '' || password.value == '' || conf.value == '') {
+        alert('You must provide all the requested details. Please try again');
+        return false;
+    }
+
+   
+    if (password.value.length < 6) {
+        alert('Passwords must be at least 6 characters long.  Please try again');
+        form.password.focus();
+        return false;
+    }
+
+    // At least one number, one lowercase and one uppercase letter
+    // At least six characters
+    // var re = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
+   
+    // if (!re.test(password.value)) {
+    //     alert('Passwords must contain at least one number, one lowercase and one uppercase letter.  Please try again');
+    //     return false;
+    // }
+
+    // Check password and confirmation are the same
+    if (password.value != conf.value) {
+        alert('Your password and confirmation do not match. Please try again');
+        form.password.focus();
+        return false;
+    }
+
+		// var common_passwords = ["123456","password","12345678","qwerty","12345","123456789","letmein","1234567","football","iloveyou"];
+
+		// var i;
+
+		// for(i = 0 ; i < common_passwords.length; i++)
+		// {
+		// 	if(password.value == common_passwords[i])
+		// 	{
+		// 		alert("Weak Password!");
+		// 		form.password.focus();
+		// 		return false;
+		// 	}
+        // }
+        
+        var result = zxcvbn(password.value);
+        if(result.score == 0)
+        {
+            alert("Very Weak Password! Try Something else.");
+            form.password.focus;
+            return false;
+        }
+        else if(result.score == 1)
+        {
+            alert("Weak Password! Try something else.");
+            form.password.focus;
+            return false;
+        }
+        
 		// Create a new element input, this will be our hashed password field.
     var p = document.createElement("input");
 

@@ -15,14 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-include_once 'includes/register.inc.php';
+include_once 'includes/forgot.inc.php';
 include_once 'includes/functions.php';
 ?>
+
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Secure Login: Registration Form</title>
+        <title>Secure Login: Forgot Password Form</title>
         <script type="text/JavaScript" src="js/zxcvbn.js"></script>
         <script type="text/JavaScript" src="js/sha512.js"></script>
         <script type="text/JavaScript" src="js/forms.js"></script>
@@ -31,29 +32,17 @@ include_once 'includes/functions.php';
     <body>
         <!-- Registration form to be output if the POST variables are not
         set or if the registration script caused an error. -->
-        <h1>Register with us</h1>
+        <h1>Please answer the following </h1>
         <?php
         if (!empty($error_msg)) {
             echo $error_msg;
         }
         ?>
-        <ul>
-            <li>Usernames may contain only digits, upper and lower case letters and underscores</li>
-            <li>Emails must have a valid email format</li>
-            <li>Passwords must be at least 6 characters long</li>
-            <!-- <li>Passwords must contain
-                <ul>
-                    <li>At least one upper case letter (A..Z)</li>
-                    <li>At least one lower case letter (a..z)</li>
-                    <li>At least one number (0..9)</li>
-                </ul>
-            </li> -->
-            <li>Your password and confirmation must match exactly</li>
-        </ul>
-        <form method="post" name="registration_form" action="<?php echo esc_url($_SERVER['PHP_SELF']); ?>">
+       
+        <form method="post" name="forgot form" action="<?php echo esc_url($_SERVER['PHP_SELF']); ?>">
             Username: <input type='text' name='username' id='username' /><br>
             Email: <input type="text" name="email" id="email" /><br>
-            Password: <input type="password"
+            New Password: <input type="password"
                              name="password"
                              id="password"/><br>
             Confirm password: <input type="password"
@@ -68,8 +57,8 @@ include_once 'includes/functions.php';
             </select><br>
             Answer: <input type="text" name="ans" id="ans" /><br>
             <input type="button"
-                   value="Register"
-                   onclick="return regformhash(this.form,
+                   value="Go!"
+                   onclick="return forformhash(this.form,
                                    this.form.username,
                                    this.form.email,
                                    this.form.password,
